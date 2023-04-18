@@ -1,0 +1,123 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Check</title>
+    <style>
+        .visibility{
+            display:block !important;
+        }
+        .formgroup .indicators {
+            width: 250px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .formgroup .indicators .low, .medium, .strong {
+            height: 10px;
+            border-radius: 5px;
+            width: 80px;
+            display:none;
+        }
+
+        .formgroup .indicators .low {
+            background-color: #FF0000;
+            border: thin solid #fff;
+        }
+
+        .formgroup .indicators .medium {
+            background-color: #E5FF00;
+            border: thin solid #ffffff;
+        }
+
+        .formgroup .indicators .strong {
+            background-color: rgb(81, 255, 0);
+            border: thin solid #51FF00;
+        }
+
+        .formgroup .inputgroup {
+            width: 250px;
+        }
+
+        .formgroup .inputgroup input {
+            padding: 5px;
+            width: 100%;
+            border: thin solid silver;
+            border-radius: 5px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="formgroup">
+        <div class="inputgroup">
+            <input type="text" id="pass">
+        </div>
+        <div class="indicators">
+            <div class="low"></div>
+            <div class="medium"></div>
+            <div class="strong"></div>
+        </div>
+    </div>
+
+    <script>
+        let input = document.querySelector("#pass");
+
+        input.addEventListener('keyup', function () {
+            let strong = document.querySelector('.strong');
+            let medium = document.querySelector('.medium');
+            let low = document.querySelector('.low');
+            let password = this.value;
+            const req = new XMLHttpRequest();
+            req.open("Post", "/Password/CheckPasswordStrong?password=" + password, true);
+            req.send(JSON.stringify(password));
+            req.onreadystatechange = function () {
+                if (req.readyState == 4 && req.status == 200) {
+                    var resObj = JSON.parse(this.responseText);
+                    console.log(resObj);
+
+                    if (resObj.count == 0) {
+                        let allVisibility = document.querySelectorAll('.visibility');
+
+                        for (var i = 0; i < allVisibility.length; i++) {
+                            allVisibility[i].classList.remove('visibility');
+                        }
+                    }
+
+                    if (resObj.count == 4) {
+                        strong.classList.add('visibility');
+                    }
+
+                    if (resObj.count < 4) {
+                        strong.classList.remove('visibility');
+                    }
+
+                    if (resObj.count == 2) {
+                        low.classList.add('visibility');
+                    }
+
+                    if (resObj.count < 2) {
+                        low.classList.remove('visibility');
+                    }
+
+                    if (resObj.count == 3) {
+                        medium.classList.add('visibility');
+                    }
+
+                    if (resObj.count < 3) {
+                        medium.classList.remove('visibility');
+                    }
+                   
+                }
+            }
+        });
+    </script>
+</body>
+</html>
